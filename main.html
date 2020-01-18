@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="style.css">
+  <title>Mult Chart</title>
+</head>
+<body>
+  <header>
+    <h1>Mult Chart Calculator</h1>
+  </header>
+  <form>
+    <div class="formbox">
+      <label for="multlength">Mult Length</label><br>
+      <input type="number" value="0" min='0.01' id="multlength" tabindex="1">
+    </div>
+    <div class="formbox">
+      <label for="plustolpermult">+Tolerance (per mult)</label><br>
+      <input type="number" min='0' value="0" id="plustolpermult" tabindex="2" >
+    </div>
+    <div class="formbox">
+      <label for="minustolpermult">-Tolerance (per mult)</label><br>
+      <input type="number" min='0' value="0" id="minustolpermult" tabindex="3">
+    </div>
+    <div class="formbox">
+      <label for="plustolperbar">+Tolerance (per bar)</label><br>
+      <input type="number" min='0' value="0" id="plustolperbar" tabindex="4">
+    </div>
+    <div class="formbox">
+      <label for="minustolperbar">-Tolerance (per bar)</label><br>
+      <input type="number" min='0' value="0" id="minustolperbar" tabindex="5">
+    </div>
+    <div class="formbox">
+      <label for="kerf">Kerf</label><br>
+      <input type="number" id="kerf" min='0' value="0" tabindex="6">
+    </div>
+    <div class="formbox">
+      <label for="maxtotallength">Max Total Length</label><br>
+      <input type="number" min='0' value="216" id="maxtotallength" tabindex="7">
+    </div>
+    <div class="formbox">
+      <input id="button" type="button" value="Calculate Mult Chart" onclick="MakeMultChart()" tabindex="8">
+    </div>
+  </form>
+
+  <table id="multchart">
+
+  </table>
+
+  <script type="text/javascript">
+
+
+    const numInputs = document.querySelectorAll('input[type=number]')
+
+    numInputs.forEach(function (input) {
+      input.addEventListener('change', function (e) {
+        if (e.target.value == '') {
+          e.target.value = 0
+        }
+      })
+    })
+
+
+
+    function MakeMultChart(){
+
+      inputslist = document.querySelectorAll("input");
+      inputslistvalues = [];
+      for (var i = 0; i < (inputslist.length - 1); i++) {
+        inputslistvalues.push(parseFloat(inputslist[i].value));
+      }
+
+
+      if (parseFloat(document.getElementById('multlength').value)==0) {
+        document.getElementById('multchart').innerHTML = 'Mult Length Cannot Be "0"'
+      }
+      else if (inputslistvalues.some(v => v < 0)) {
+        document.getElementById('multchart').innerHTML = 'No Inputs Can Be Less Than Zero'
+      }
+
+      else {
+
+        var multlength = parseFloat(document.getElementById('multlength').value);
+        var plustolpermult = parseFloat(document.getElementById('plustolpermult').value);
+        var minustolpermult = parseFloat(document.getElementById('minustolpermult').value);
+        var plustolperbar = parseFloat(document.getElementById('plustolperbar').value);
+        var minustolperbar = parseFloat(document.getElementById('minustolperbar').value);
+        var kerf = parseFloat(document.getElementById('kerf').value);
+        var maxtotallength = parseFloat(document.getElementById('maxtotallength').value);
+
+        var tabletext = '<tr><th># of Mults</th><th>Min Length</th><th>Max Length</th></tr>';
+
+        var minmultlength = 0;
+        var maxmultlength = 0;
+
+        for (var i = 1; ((i*(multlength-minustolpermult)-minustolperbar)+(kerf*(i-1))) < maxtotallength; i++) {
+          minmultlength = ((i*(multlength-minustolpermult)-minustolperbar)+(kerf*(i-1)));
+          maxmultlength = ((i*(multlength+plustolpermult)+plustolperbar)+(kerf*(i-1)));
+          tabletext = tabletext + '<tr><td>' + String(i) + '</td><td>' + String(minmultlength) + '</td><td>' + String(maxmultlength);
+        }
+
+        document.getElementById('multchart').innerHTML = tabletext;
+
+      }
+
+
+
+    }
+
+  </script>
+</body>
+</html>
